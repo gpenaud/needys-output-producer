@@ -16,7 +16,7 @@ RUN CGO_ENABLED=0 GOOS=linux \
   go build \
     -a -installsuffix cgo \
     -o /needys-output-producer \
-  /application/cmd/needys-output-producer-server/main.go
+  /application/cmd/needys-output-producer-listener/main.go
 
 # ---------------------------------------------------------------------------- #
 
