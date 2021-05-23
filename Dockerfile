@@ -29,6 +29,4 @@ USER needys-output-producer
 
 COPY --from=build /needys-output-producer .
 
-EXPOSE 8010
-
-CMD ["./needys-output-producer"]
+ENTRYPOINT ["./needys-output-producer"]
