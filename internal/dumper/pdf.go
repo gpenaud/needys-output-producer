@@ -1,4 +1,4 @@
-package dumper
+package producer
 
 import (
   "github.com/jung-kurt/gofpdf"

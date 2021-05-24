@@ -4,8 +4,8 @@ import (
   "github.com/galdor/go-cmdline"
   "os"
   // local packages
-  "github.com/gpenaud/needys-output-producer/internal/models"
-  "github.com/gpenaud/needys-output-producer/internal/utils"
+  "github.com/gpenaud/needys-output-producer/internal/config"
+  "github.com/gpenaud/needys-output-producer/internal/rabbitmq_consumer"
 )
 
 func main() {
@@ -26,10 +26,10 @@ func main() {
   cmdline.AddFlag("v", "verbose", "log more information")
   cmdline.Parse(os.Args)
 
-  models.Cfg.Rabbitmq.Host = cmdline.OptionValue("rabbitmq.host")
-  models.Cfg.Rabbitmq.Port = cmdline.OptionValue("rabbitmq.port")
-  models.Cfg.Rabbitmq.Username = cmdline.OptionValue("rabbitmq.username")
-  models.Cfg.Rabbitmq.Password = cmdline.OptionValue("rabbitmq.password")
+  config.Cfg.Rabbitmq.Host = cmdline.OptionValue("rabbitmq.host")
+  config.Cfg.Rabbitmq.Port = cmdline.OptionValue("rabbitmq.port")
+  config.Cfg.Rabbitmq.Username = cmdline.OptionValue("rabbitmq.username")
+  config.Cfg.Rabbitmq.Password = cmdline.OptionValue("rabbitmq.password")
 
-  utils.WaitForAmqpMessages()
+  rabbitmq_consumer.WaitForAmqpMessages()
 }

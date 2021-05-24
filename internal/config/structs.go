@@ -1,4 +1,4 @@
-package models
+package config
 
 type Config struct {
   Rabbitmq struct {

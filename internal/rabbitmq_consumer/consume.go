@@ -1,28 +1,34 @@
-package utils
+package rabbitmq_consumer
 
 import (
 	"fmt"
 	"github.com/streadway/amqp"
-	"log"
 	// local packages
-  "github.com/gpenaud/needys-output-producer/internal/models"
+  "github.com/gpenaud/needys-output-producer/internal/config"
+	"github.com/gpenaud/needys-output-producer/pkg/log"
 )
 
 func WaitForAmqpMessages() {
 	rabbitmq_connection_parameters := fmt.Sprintf(
 		"amqp://%s:%s@%s:%s/",
-		models.Cfg.Rabbitmq.Username,
-		models.Cfg.Rabbitmq.Password,
-		models.Cfg.Rabbitmq.Host,
-		models.Cfg.Rabbitmq.Port,
+		config.Cfg.Rabbitmq.Username,
+		config.Cfg.Rabbitmq.Password,
+		config.Cfg.Rabbitmq.Host,
+		config.Cfg.Rabbitmq.Port,
 	)
 
 	conn, err := amqp.Dial(rabbitmq_connection_parameters)
-  FailOnError(err, "Failed to connect to RabbitMQ")
+	if err != nil {
+		log.ErrorLogger.Fatalln("Failed to connect to RabbitMQ")
+	}
+
 	defer conn.Close()
 
 	ch, err := conn.Channel()
-	FailOnError(err, "Failed to open a channel")
+	if err != nil {
+		log.ErrorLogger.Fatalln("Failed to open a channel")
+	}
+
 	defer ch.Close()
 
 	q, err := ch.QueueDeclare(
@@ -33,7 +39,9 @@ func WaitForAmqpMessages() {
 		false,   // no-wait
 		nil,     // arguments
 	)
-	FailOnError(err, "Failed to declare a queue")
+	if err != nil {
+		log.ErrorLogger.Fatalln("Failed to declare a queue")
+	}
 
 	messages, err := ch.Consume(
 		q.Name, // queue
@@ -44,17 +52,18 @@ func WaitForAmqpMessages() {
 		false,  // no-wait
 		nil,    // args
 	)
-
-	FailOnError(err, "Failed to register a consumer")
+	if err != nil {
+		log.ErrorLogger.Fatalln("Failed to register a consumer")
+	}
 
 	forever := make(chan bool)
 
 	go func() {
 		for m := range messages {
-			log.Printf("Received a message: %s", m.Body)
+			log.InfoLogger.Printf("Received a message: %s", m.Body)
 		}
 	}()
 
-	log.Printf(" [*] Waiting for messages. To exit press CTRL+C")
+	log.InfoLogger.Println(" [*] Waiting for messages. To exit press CTRL+C")
 	<-forever
 }
